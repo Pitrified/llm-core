@@ -1,0 +1,8 @@
+# Render Blueprint
+# https://render.com/docs/blueprint-spec
+#
+# llm-core is a library - no web service deployment is configured.
+# This file is kept as a placeholder for future needs.
+
+services: []
+#   maxmemoryPolicy: allkeys-lru
