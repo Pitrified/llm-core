@@ -39,15 +39,17 @@ implemented and tested. No further work needed.
 ---
 
 ### Block 1 - Dependencies and framework alignment
-**Status: NOT STARTED**
+**Status: DONE**
 **Sub-plan:** [02-dependencies.md](02-dependencies.md)
 
-- Decide Haystack vs LangChain (plan says LangChain; current deps say Haystack)
-- Restructure `pyproject.toml` with optional dependency groups per provider
-- Core: `pydantic`, `langchain-core`, `jinja2`, `loguru`
-- Optional: `openai`, `azure`, `ollama`, `huggingface`, `chroma`
-- Ensure `uv sync` resolves cleanly
-- Run `uv run pytest && uv run ruff check . && uv run pyright` to verify
+- Removed Haystack deps (`haystack-ai`, `chroma-haystack`, `ollama-haystack`, `openai`, `tiktoken`)
+- Added core deps: `langchain>=0.3`, `langchain-core>=0.3`, `pydantic>=2.0`, `jinja2>=3.1`
+- Added `[project.optional-dependencies]` groups: `openai`, `azure`, `ollama`, `huggingface`,
+  `chroma`, `all`
+- `uv sync --all-extras --all-groups` resolved cleanly (204 packages)
+- `uv run pytest && uv run ruff check . && uv run pyright` - all 24 tests pass, 0 lint/type errors
+- Open question resolved: `langchain>=0.3` (full package) is required as a core dep because
+  `init_chat_model` / `init_embeddings` live in `langchain`, not `langchain-core`
 
 ---
 
