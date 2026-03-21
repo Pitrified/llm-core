@@ -92,6 +92,11 @@ its import paths updated. The mapping is one-to-one:
 | `from laife.llm.prompt_loader import PromptLoader, PromptLoaderConfig` | `from llm_core.prompts.prompt_loader import PromptLoader, PromptLoaderConfig` |
 | `from laife.llm.prompt_loader import NoPromptVersionFoundError` | `from llm_core.prompts.prompt_loader import NoPromptVersionFoundError` |
 | `from laife.entities.vectorable import Vectorable` | `from llm_core.vectorstores.vectorable import Vectorable` |
+| `from laife.llm_services.vectorstores.cond import CompCond, CompOp` | `from llm_core.vectorstores.cond import CompCond, CompOp` |
+| `from laife.llm_services.vectorstores.cond import InclusionCond, InclusionOp` | `from llm_core.vectorstores.cond import InclusionCond, InclusionOp` |
+| `from laife.llm_services.vectorstores.cond import LogicalCond, LogicalOp` | `from llm_core.vectorstores.cond import LogicalCond, LogicalOp` |
+| `from laife.llm_services.vectorstores.cond import NotCond, DocCond` | `from llm_core.vectorstores.cond import NotCond, DocCond` |
+| `from laife.llm_services.vectorstores.cond import AnyCond` | `from llm_core.vectorstores.cond import AnyCond` |
 
 Or use the submodule shorthand from `__init__`:
 
@@ -167,6 +172,35 @@ config = ChromaConfig(persist_directory=str(paths.vectorstore_fol))
 from llm_core.vectorstores.config import ChromaConfig
 config = ChromaConfig(persist_directory=str(paths.vectorstore_fol))
 ```
+
+### Condition-based filtering
+
+`EntityStore.search()` no longer accepts `**filter_kwargs`. Pass a `cond`
+argument instead:
+
+```python
+# Before
+results = store.search("query", k=5, entity_type_meta="building")
+
+# After
+from llm_core.vectorstores.cond import CompCond, CompOp
+
+results = store.search(
+    "query",
+    k=5,
+    cond=CompCond("entity_type", CompOp.EQ, "building"),
+)
+```
+
+Compound conditions use operator overloading:
+
+```python
+cond = CompCond("entity_type", CompOp.EQ, "building") & CompCond("level", CompOp.GT, 2)
+results = store.search("query", k=5, cond=cond)
+```
+
+The condition AST is backend-agnostic. Serialization to Chroma's `$where` /
+`$where_document` format is handled internally by `CChroma.cond_search()`.
 
 ---
 

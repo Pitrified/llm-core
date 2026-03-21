@@ -95,8 +95,11 @@ class TestEntityStoreSearch:
         assert isinstance(results[0], SampleEntity)
         assert results[0].text == "typed content"
 
-    def test_search_no_entity_and_filter_kwargs(self) -> None:
-        """search() without entity_type and filter_kwargs passes filter to backend."""
+    def test_search_no_entity_and_cond(self) -> None:
+        """search() without entity_type but with cond filters correctly."""
+        from llm_core.vectorstores.cond import CompCond  # noqa: PLC0415
+        from llm_core.vectorstores.cond import CompOp  # noqa: PLC0415
+
         store = _make_store()
         store.save(SampleEntity("alpha", entity_type="type_a"))
         store.save(SampleEntity("beta", entity_type="type_b"))
@@ -104,15 +107,17 @@ class TestEntityStoreSearch:
         results = store.search(
             "alpha",
             k=5,
-            entity_type_meta="type_a",
+            cond=CompCond("entity_type", CompOp.EQ, "type_a"),
         )
-        # This mainly verifies that filter_kwargs are passed through.
-        # Chroma's ephemeral store may or may not filter perfectly depending
-        # on its metadata indexing, but the call must not raise.
         assert isinstance(results, list)
+        assert len(results) == 1
+        assert results[0].page_content == "alpha"
 
-    def test_search_with_entity_and_filter_kwargs(self) -> None:
-        """search() with entity_type and filter_kwargs passes filter to backend."""
+    def test_search_with_entity_and_cond(self) -> None:
+        """search() with entity_type and cond filters and deserializes."""
+        from llm_core.vectorstores.cond import CompCond  # noqa: PLC0415
+        from llm_core.vectorstores.cond import CompOp  # noqa: PLC0415
+
         store = _make_store()
         store.save(SampleEntity("alpha", entity_type="type_a"))
         store.save(SampleEntity("beta", entity_type="type_b"))
@@ -121,9 +126,9 @@ class TestEntityStoreSearch:
             "alpha",
             entity_type=SampleEntity,
             k=5,
-            entity_type_meta="type_a",
+            cond=CompCond("entity_type", CompOp.EQ, "type_a"),
         )
-        # This mainly verifies that filter_kwargs are passed through.
-        # Chroma's ephemeral store may or may not filter perfectly depending
-        # on its metadata indexing, but the call must not raise.
         assert isinstance(results, list)
+        assert len(results) == 1
+        assert isinstance(results[0], SampleEntity)
+        assert results[0].text == "alpha"

@@ -4,6 +4,9 @@
 ``Document`` objects, and stores them in a vector store. On retrieval, raw
 documents are returned or typed entities are reconstructed via ``from_document``.
 
+Filtering is delegated entirely to the underlying store via the
+``CondSearchable`` protocol - ``EntityStore`` never touches serialization.
+
 Example:
     ::
 
@@ -11,6 +14,10 @@ Example:
         store.save(my_entity)
         docs = store.search("find something similar")
         typed = store.search("find something", entity_type=MyEntity)
+        filtered = store.search(
+            "find active",
+            cond=CompCond("status", CompOp.EQ, "active"),
+        )
 """
 
 from collections.abc import Iterable
@@ -18,7 +25,10 @@ from typing import Any
 from typing import overload
 
 from langchain_core.documents import Document
+from langchain_core.vectorstores import VectorStore
 
+from llm_core.vectorstores.cond import AnyCond
+from llm_core.vectorstores.cond import CondSearchable
 from llm_core.vectorstores.config.base import VectorStoreConfig
 from llm_core.vectorstores.vectorable import Vectorable
 
@@ -30,13 +40,27 @@ class EntityStore:
     only place that holds a reference to the vector DB and performs I/O.
     """
 
+    _vs: VectorStore
+    _cs: CondSearchable
+
     def __init__(self, config: VectorStoreConfig) -> None:
         """Initialise the store by creating a vector store from *config*.
+
+        The backend must satisfy both ``VectorStore`` (for add/save) and
+        ``CondSearchable`` (for filtered search).
 
         Args:
             config: Vector store configuration used to create the backend.
         """
-        self._store = config.create_store()
+        store = config.create_store()
+        if not isinstance(store, CondSearchable):
+            msg = (
+                f"{type(store).__name__} does not satisfy CondSearchable; "
+                "EntityStore requires a backend with cond_search() support"
+            )
+            raise TypeError(msg)
+        self._vs = store
+        self._cs = store
 
     # -- write ---------------------------------------------------------------
 
@@ -51,7 +75,7 @@ class EntityStore:
         docs = [e.to_document() for e in entities]
         if len(docs) == 0:
             return
-        self._store.add_documents(docs)
+        self._vs.add_documents(docs)
 
     # -- read ----------------------------------------------------------------
 
@@ -62,7 +86,7 @@ class EntityStore:
         *,
         entity_type: None = None,
         k: int = ...,
-        **filter_kwargs: Any,  # noqa: ANN401
+        cond: AnyCond | None = ...,
     ) -> list[Document]: ...
     @overload
     def search[T: Vectorable](
@@ -71,7 +95,7 @@ class EntityStore:
         *,
         entity_type: type[T],
         k: int = ...,
-        **filter_kwargs: Any,  # noqa: ANN401
+        cond: AnyCond | None = ...,
     ) -> list[T]: ...
 
     def search(
@@ -80,25 +104,23 @@ class EntityStore:
         *,
         entity_type: type[Vectorable] | None = None,
         k: int = 4,
-        **filter_kwargs: Any,
+        cond: AnyCond | None = None,
     ) -> Any:
         """Similarity search returning raw Documents or typed entities.
 
         Args:
             query: Free-text similarity query.
             entity_type: When provided, results are deserialized into this
-                type via ``from_document``. Filter kwargs are also forwarded
-                to the backend.
+                type via ``from_document``.
             k: Maximum number of results to return.
-            filter_kwargs: Additional metadata filters passed to the backend's
-                ``similarity_search(filter=...)``.
+            cond: Optional condition tree for metadata/document-level
+                filtering. Serialization is handled by the backend adapter.
 
         Returns:
             Up to *k* results: ``list[Document]`` when ``entity_type`` is
             ``None``, or ``list[T]`` when a type is given.
         """
-        search_filter = filter_kwargs or None
-        docs = self._store.similarity_search(query, k=k, filter=search_filter)
+        docs = self._cs.cond_search(query, k=k, cond=cond)
         if entity_type is None:
             return docs
         return [entity_type.from_document(doc) for doc in docs]
