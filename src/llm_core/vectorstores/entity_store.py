@@ -56,7 +56,14 @@ class EntityStore:
     # -- read ----------------------------------------------------------------
 
     @overload
-    def search(self, query: str, *, k: int = ...) -> list[Document]: ...
+    def search(
+        self,
+        query: str,
+        *,
+        entity_type: None = None,
+        k: int = ...,
+        **filter_kwargs: Any,  # noqa: ANN401
+    ) -> list[Document]: ...
     @overload
     def search[T: Vectorable](
         self,

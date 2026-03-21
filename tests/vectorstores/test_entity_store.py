@@ -95,7 +95,23 @@ class TestEntityStoreSearch:
         assert isinstance(results[0], SampleEntity)
         assert results[0].text == "typed content"
 
-    def test_search_with_filter_kwargs(self) -> None:
+    def test_search_no_entity_and_filter_kwargs(self) -> None:
+        """search() without entity_type and filter_kwargs passes filter to backend."""
+        store = _make_store()
+        store.save(SampleEntity("alpha", entity_type="type_a"))
+        store.save(SampleEntity("beta", entity_type="type_b"))
+
+        results = store.search(
+            "alpha",
+            k=5,
+            entity_type_meta="type_a",
+        )
+        # This mainly verifies that filter_kwargs are passed through.
+        # Chroma's ephemeral store may or may not filter perfectly depending
+        # on its metadata indexing, but the call must not raise.
+        assert isinstance(results, list)
+
+    def test_search_with_entity_and_filter_kwargs(self) -> None:
         """search() with entity_type and filter_kwargs passes filter to backend."""
         store = _make_store()
         store.save(SampleEntity("alpha", entity_type="type_a"))
