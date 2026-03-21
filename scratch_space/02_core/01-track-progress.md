@@ -9,7 +9,7 @@ Update this file as needed to reflect changes in the plan, and to track progress
 
 ## Current state
 
-Blocks 0-4 are fully implemented and tested:
+Blocks 0-6 are fully implemented and tested:
 
 - `BaseModelKwargs` (data_models)
 - `Singleton` metaclass
@@ -19,9 +19,13 @@ Blocks 0-4 are fully implemented and tested:
 - `ChatConfig` + provider subclasses (OpenAI, AzureOpenAI, Ollama, HuggingFace)
 - `EmbeddingsConfig` + provider subclasses (OpenAI, AzureOpenAI, Ollama, HuggingFace)
 - `PromptLoader` + `PromptLoaderConfig` + `NoPromptVersionFoundError`
-- Full test suite for all the above (81 tests, all pass)
+- `StructuredLLMChain[InputT, OutputT]` + `FakeChatModel` / `FakeChatModelConfig`
+- `Vectorable` + `Promptable` protocols, `document_id` hasher
+- `VectorStoreConfig`, `ChromaConfig`, `DeduplicatingMixin`, `CChroma`
+- `EntityStore` facade (save / save_many / search with typed overload)
+- Full test suite for all the above (119 tests, all pass)
 
-**Not yet implemented:** `StructuredLLMChain`, vectorstores, exceptions module (Blocks 5-7).
+**Not yet implemented:** Exceptions module, polish (Block 7), release (Block 8).
 
 ---
 
@@ -89,32 +93,33 @@ implemented and tested. No further work needed.
 ---
 
 ### Block 5 - StructuredLLMChain
-**Status: NOT STARTED**
+**Status: DONE**
 **Sub-plan:** [06-structured-chain.md](06-structured-chain.md)
 
-- `src/llm_core/chains/structured_chain.py` - `StructuredLLMChain[InputT, OutputT]`
-- Prompt variable validation (both directions, per pitfall #6)
-- `invoke()` and `ainvoke()`
-- `lazy: bool = False` flag (per pitfall #5)
-- `FakeChatModel` in `src/llm_core/testing/` (moved to v1 per pitfall #8)
+- `src/llm_core/chains/structured_chain.py` - `StructuredLLMChain[InputT, OutputT]` (dataclass)
+- Property-based lazy init: `_chain` is `None` until `chain` property is first accessed
+- Prompt variable validation (bidirectional) at construction via `__post_init__`
+- `invoke()` and `ainvoke()` with Pydantic output type checking
 - Custom exceptions: `MissingPromptVariablesError`, `ExtraPromptVariablesError`
-- Tests using `FakeChatModel`
+- `FakeChatModel(BaseChatModel)` in `src/llm_core/testing/` with round-robin responses
+- `FakeChatModelConfig(ChatConfig)` for use in tests
+- 14 tests (8 chain + 6 fake model), all pass; 0 ruff / pyright errors
 
 ---
 
 ### Block 6 - Vectorstores
-**Status: NOT STARTED**
+**Status: DONE**
 **Sub-plan:** [07-vectorstores.md](07-vectorstores.md)
 
 - `src/llm_core/vectorstores/vectorable.py` - `Vectorable` protocol (`@runtime_checkable`)
-- `src/llm_core/vectorstores/hasher.py` - SHA-256 document ID generation
-- `src/llm_core/vectorstores/config/base.py` - `VectorStoreConfig` (abstract)
-- `src/llm_core/vectorstores/config/chroma.py` - `ChromaConfig`
-- `src/llm_core/vectorstores/cchroma.py` - `CChroma` (dedup-aware Chroma wrapper)
-- `src/llm_core/vectorstores/entity_store.py` - `EntityStore` facade
-- Consider splitting `DeduplicatingVectorStore` from `EntityStore` (per pitfall #9)
-- Optional `Promptable` protocol (per pitfall #10)
-- Tests
+- `src/llm_core/vectorstores/promptable.py` - `Promptable` protocol (`@runtime_checkable`)
+- `src/llm_core/vectorstores/hasher.py` - SHA-256 `document_id(content, metadata)` function
+- `src/llm_core/vectorstores/config/base.py` - `VectorStoreConfig(BaseModelKwargs, ABC)`
+- `src/llm_core/vectorstores/config/chroma.py` - `ChromaConfig` (ephemeral / persistent / server)
+- `src/llm_core/vectorstores/cchroma.py` - `DeduplicatingMixin` + `CChroma(DeduplicatingMixin, Chroma)`
+- `src/llm_core/vectorstores/entity_store.py` - `EntityStore` facade (save / save_many / overloaded search)
+- 24 tests (3 vectorable + 3 promptable + 6 hasher + 3 chroma config + 4 cchroma + 5 entity store)
+- All pass; 0 ruff / pyright errors
 
 ---
 
