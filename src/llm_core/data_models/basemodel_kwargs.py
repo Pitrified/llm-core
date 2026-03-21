@@ -16,8 +16,18 @@ class BaseModelKwargs(BaseModel):
     ) -> dict:
         """Convert the model to a dictionary, flattening any 'kwargs' attribute.
 
+        If the model contains a ``kwargs`` field whose value is a plain
+        ``dict``, that dict is merged into the top-level result rather than
+        being nested under the key ``"kwargs"``.
+
         Args:
-            exclude_none (bool): Whether to exclude None values. Defaults to False.
+            exclude_none: Whether to exclude ``None`` values from both the
+                model fields and any nested ``kwargs`` dict. Defaults to
+                ``False``.
+
+        Returns:
+            Flat dictionary suitable for passing as ``**kwargs`` to a
+            third-party constructor.
         """
         base_dict = (
             {k: v for k, v in self if v is not None} if exclude_none else dict(self)

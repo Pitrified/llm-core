@@ -127,7 +127,7 @@ implemented and tested. No further work needed.
 **Status: MERGED WITH RELEASE/SKIPPED/DEFERRED**
 
 - Centralized `src/llm_core/exceptions.py` with all custom exceptions: skipped
-- `validate_vectorable()` helper (per pitfall #7): deferred
+- `validate_vectorable()` helper (per pitfall #7): deferred, add it to future steps
 - Review all `__init__.py` public API exports: skipped
 - Docstrings (Google style) on all public classes/methods: deferred to block 8
 - Run full verification: `uv run pytest && uv run ruff check . && uv run pyright`: done
@@ -135,16 +135,21 @@ implemented and tested. No further work needed.
 ---
 
 ### Block 8 - v1 release and consumer migration
-**Status: NOT STARTED**
+**Status: DONE**
 **Sub-plan:** [08-release-migration.md](08-release-migration.md)
 
-- Write `CHANGELOG.md` (v0.1.0)
-- Git tag `v0.1.0`
-- Consumer migration guide per repo (laife, recipamatic, convo-craft, recipinator)
-- Makefile template for local editable development
-- Update consumer `pyproject.toml` examples
-- Document extension contract (subclassing for new providers)
-- Review and update `/docs`
+- [x] Write `CHANGELOG.md` (v0.1.0)
+- [x] Git tag `v0.1.0`
+- [x] Consumer migration guides: [laife](08-migration-laife.md),
+      [recipamatic](08-migration-recipamatic.md),
+      [convo-craft](08-migration-convo-craft.md),
+      [recipinator](08-migration-recipinator.md)
+- [x] README.md updated with install + full quickstart examples
+- [x] All `__init__.py` files expose `__all__` with key public symbols
+- [x] Docstrings complete (Google style); `to_kw()` Returns section added;
+      `PromptLoader._prompt_path()` docstring added
+- [x] 120 tests pass; 0 ruff; 0 pyright
+- Makefile template for local editable development: deferred (see 08-release-migration.md)
 
 ---
 

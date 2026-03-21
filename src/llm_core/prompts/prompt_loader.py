@@ -89,6 +89,11 @@ class PromptLoader:
         return str(max(versions))
 
     def _prompt_path(self) -> Path:
+        """Return the full path to the resolved versioned prompt file.
+
+        Returns:
+            Absolute path to the ``.jinja`` file for the resolved version.
+        """
         version = self._resolve_version()
         return (
             self.config.base_prompt_fol / self.config.prompt_name / f"v{version}.jinja"
