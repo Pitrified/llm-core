@@ -97,9 +97,9 @@ Test cases:
 
 ## Checklist
 
-- [ ] Read laife's prompt_loader.py for exact implementation
-- [ ] Create PromptLoaderConfig
-- [ ] Create PromptLoader with version discovery and caching
-- [ ] Create NoPromptVersionFoundError
-- [ ] Write tests with temp directories
-- [ ] `uv run pytest && uv run ruff check . && uv run pyright`
+- [x] Read laife's prompt_loader.py for exact implementation
+- [x] Create PromptLoaderConfig
+- [x] Create PromptLoader with version discovery and caching
+- [x] Create NoPromptVersionFoundError
+- [x] Write tests with temp directories
+- [x] `uv run pytest && uv run ruff check . && uv run pyright`

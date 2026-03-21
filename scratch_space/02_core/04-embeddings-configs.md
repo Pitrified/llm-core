@@ -95,8 +95,8 @@ Integration tests (actual embedding calls) gated by API key availability.
 
 ## Checklist
 
-- [ ] Read laife's embeddings config files for exact field names
-- [ ] Create base.py with EmbeddingsConfig
-- [ ] Create provider subclasses
-- [ ] Write tests
-- [ ] `uv run pytest && uv run ruff check . && uv run pyright`
+- [x] Read laife's embeddings config files for exact field names
+- [x] Create base.py with EmbeddingsConfig
+- [x] Create provider subclasses
+- [x] Write tests
+- [x] `uv run pytest && uv run ruff check . && uv run pyright`

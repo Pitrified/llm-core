@@ -102,12 +102,12 @@ Test strategy:
 
 ## Checklist
 
-- [ ] Read laife's actual chat config files for exact field names
-- [ ] Create base.py with ChatConfig
-- [ ] Create openai.py
-- [ ] Create azure_openai.py
-- [ ] Create ollama.py
-- [ ] Create huggingface.py
-- [ ] Create all __init__.py files
-- [ ] Write tests
-- [ ] `uv run pytest && uv run ruff check . && uv run pyright`
+- [x] Read laife's actual chat config files for exact field names
+- [x] Create base.py with ChatConfig
+- [x] Create openai.py
+- [x] Create azure_openai.py
+- [x] Create ollama.py
+- [x] Create huggingface.py
+- [x] Create all __init__.py files
+- [x] Write tests
+- [x] `uv run pytest && uv run ruff check . && uv run pyright`

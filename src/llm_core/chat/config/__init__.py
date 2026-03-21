@@ -1,0 +1,1 @@
+"""Chat config submodule."""

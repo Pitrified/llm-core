@@ -9,22 +9,19 @@ Update this file as needed to reflect changes in the plan, and to track progress
 
 ## Current state
 
-The foundation layers are implemented and tested:
+Blocks 0-4 are fully implemented and tested:
 
 - `BaseModelKwargs` (data_models)
 - `Singleton` metaclass
 - `EnvType` system (DEV/PROD x LOCAL/RENDER)
 - `LlmCoreParams` singleton, `LlmCorePaths`, `SampleParams`, `SampleConfig`
 - `load_env()`
-- Full test suite for the above
+- `ChatConfig` + provider subclasses (OpenAI, AzureOpenAI, Ollama, HuggingFace)
+- `EmbeddingsConfig` + provider subclasses (OpenAI, AzureOpenAI, Ollama, HuggingFace)
+- `PromptLoader` + `PromptLoaderConfig` + `NoPromptVersionFoundError`
+- Full test suite for all the above (81 tests, all pass)
 
-**Not yet implemented:** chat configs, embeddings configs, StructuredLLMChain,
-PromptLoader, vectorstores, exceptions module - i.e. all the LLM-specific layers.
-
-**Dependency question:** `pyproject.toml` currently lists Haystack dependencies
-(`haystack-ai`, `ollama-haystack`, `chroma-haystack`), but the plan and
-`copilot-instructions.md` describe a LangChain-based architecture. This must
-be resolved in Block 1.
+**Not yet implemented:** `StructuredLLMChain`, vectorstores, exceptions module (Blocks 5-7).
 
 ---
 
@@ -54,37 +51,40 @@ implemented and tested. No further work needed.
 ---
 
 ### Block 2 - Chat config layer
-**Status: NOT STARTED**
+**Status: DONE**
 **Sub-plan:** [03-chat-configs.md](03-chat-configs.md)
 
 - `src/llm_core/chat/config/base.py` - `ChatConfig(BaseModelKwargs)` + `create_chat_model()`
 - Provider subclasses: OpenAI, AzureOpenAI, Ollama, HuggingFace
 - Each provider only overrides `model`, `model_provider`, and provider-specific fields
 - Uses `init_chat_model(**self.to_kw(exclude_none=True))` for dispatch
-- Tests for each provider config (construction, `to_kw()` output, `create_chat_model()`)
+- Tests for each provider config (construction, `to_kw()` output; integration tests deferred)
+- 25 tests, all pass; 0 ruff / pyright errors
 
 ---
 
 ### Block 3 - Embeddings config layer
-**Status: NOT STARTED**
+**Status: DONE**
 **Sub-plan:** [04-embeddings-configs.md](04-embeddings-configs.md)
 
 - `src/llm_core/embeddings/config/base.py` - `EmbeddingsConfig(BaseModelKwargs)` + `create_embeddings()`
 - Provider subclasses: OpenAI, AzureOpenAI, Ollama, HuggingFace
 - Uses `init_embeddings(**self.to_kw(exclude_none=True))` for dispatch
-- Tests
+- Note: field is `provider` (not `model_provider`) - matches what `init_embeddings()` expects
+- 20 tests, all pass; 0 ruff / pyright errors
 
 ---
 
 ### Block 4 - Prompt system
-**Status: NOT STARTED**
+**Status: DONE**
 **Sub-plan:** [05-prompts.md](05-prompts.md)
 
 - `src/llm_core/prompts/prompt_loader.py` - `PromptLoader` + `PromptLoaderConfig`
 - Versioned Jinja2 file discovery (`vN.jinja`, `version="auto"` picks highest)
-- In-memory caching
+- In-memory caching (cache per `PromptLoader` instance)
 - Custom exceptions: `NoPromptVersionFoundError`
-- Tests with temp directories
+- Note: `PromptLoaderConfig` extends `BaseModelKwargs` (not plain `BaseModel`) for consistency
+- 12 tests, all pass; 0 ruff / pyright errors
 
 ---
 
