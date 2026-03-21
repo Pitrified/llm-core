@@ -67,7 +67,7 @@ class TestEntityStoreSave:
         """Saving multiple entities succeeds."""
         store = _make_store()
         entities = [SampleEntity(f"entity {i}") for i in range(3)]
-        store.save_many(entities)
+        store.save(entities)
 
         docs = store.search("entity", k=5)
         assert len(docs) == 3

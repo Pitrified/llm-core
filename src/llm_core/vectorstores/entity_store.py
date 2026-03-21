@@ -13,7 +13,7 @@ Example:
         typed = store.search("find something", entity_type=MyEntity)
 """
 
-from collections.abc import Sequence
+from collections.abc import Iterable
 from typing import Any
 from typing import overload
 
@@ -40,22 +40,17 @@ class EntityStore:
 
     # -- write ---------------------------------------------------------------
 
-    def save(self, entity: Vectorable) -> None:
-        """Convert *entity* to a Document and upsert it.
+    def save(self, entities: Vectorable | Iterable[Vectorable]) -> None:
+        """Convert one or more entities to Documents and upsert them.
 
         Args:
-            entity: A ``Vectorable`` entity to persist.
+            entities: One or an iterable of ``Vectorable`` entities to persist.
         """
-        doc = entity.to_document()
-        self._store.add_documents([doc])
-
-    def save_many(self, entities: Sequence[Vectorable]) -> None:
-        """Convert multiple entities to Documents and upsert them.
-
-        Args:
-            entities: Sequence of ``Vectorable`` entities to persist.
-        """
+        if isinstance(entities, Vectorable):
+            entities = [entities]
         docs = [e.to_document() for e in entities]
+        if len(docs) == 0:
+            return
         self._store.add_documents(docs)
 
     # -- read ----------------------------------------------------------------
