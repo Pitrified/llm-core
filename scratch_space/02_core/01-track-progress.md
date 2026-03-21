@@ -124,13 +124,13 @@ implemented and tested. No further work needed.
 ---
 
 ### Block 7 - Exceptions and polish
-**Status: NOT STARTED**
+**Status: MERGED WITH RELEASE/SKIPPED/DEFERRED**
 
-- Centralized `src/llm_core/exceptions.py` with all custom exceptions
-- `validate_vectorable()` helper (per pitfall #7)
-- Review all `__init__.py` public API exports
-- Docstrings (Google style) on all public classes/methods
-- Run full verification: `uv run pytest && uv run ruff check . && uv run pyright`
+- Centralized `src/llm_core/exceptions.py` with all custom exceptions: skipped
+- `validate_vectorable()` helper (per pitfall #7): deferred
+- Review all `__init__.py` public API exports: skipped
+- Docstrings (Google style) on all public classes/methods: deferred to block 8
+- Run full verification: `uv run pytest && uv run ruff check . && uv run pyright`: done
 
 ---
 
@@ -144,6 +144,7 @@ implemented and tested. No further work needed.
 - Makefile template for local editable development
 - Update consumer `pyproject.toml` examples
 - Document extension contract (subclassing for new providers)
+- Review and update `/docs`
 
 ---
 

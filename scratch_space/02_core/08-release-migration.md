@@ -7,12 +7,15 @@ Depends on: Block 7 (polish)
 
 ## Release checklist
 
+- [ ] Docstrings (Google style) on all public classes/methods/modules
 - [ ] All blocks 1-7 complete and passing `uv run pytest && uv run ruff check . && uv run pyright`
 - [ ] Write `CHANGELOG.md` for v0.1.0
 - [ ] Review all `__init__.py` public exports
 - [ ] Ensure `README.md` has install + quickstart examples
 - [ ] Git tag `v0.1.0`
 - [ ] Verify install from git tag: `uv pip install "llm-core[openai] @ git+...@v0.1.0"`
+- [ ] Write consumer migration guide per repo (laife, recipamatic, convo-craft, recipinator),
+      each in a different file `08-migration-<consumer>.md` for easy linking
 
 ---
 
