@@ -24,7 +24,3 @@ Quickstart::
     )
     result = chain.invoke(MyInput(text="Long article..."))
 """
-
-from llm_core.params.load_env import load_env
-
-load_env()
