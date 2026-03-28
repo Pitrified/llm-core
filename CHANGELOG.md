@@ -7,6 +7,39 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.2.0] - 2026-03-28
+
+### Added
+
+**Transcription module** (`llm_core.transcription`)
+- `BaseTranscriber` - `@runtime_checkable` protocol with `transcribe()` and
+  `atranscribe()` methods. All providers satisfy this structural protocol.
+- `TranscriptionResult` - dataclass wrapping `text`, `language`, `segments`,
+  and `provider` fields.
+- `TranscriptionSegment` - per-segment timestamped text dataclass.
+- `TranscriptionConfig(BaseModelKwargs, ABC)` - abstract base config with
+  `create_transcriber()` factory.
+- Provider subclasses under `llm_core.transcription.config`:
+  - `WhisperConfig` - openai-whisper (Torch backend).
+  - `FasterWhisperConfig` - faster-whisper (CTranslate2 backend; `int8` on
+    CPU, no Torch dependency).
+  - `OpenAIAPITranscriptionConfig` - OpenAI Whisper API.
+- Provider implementations under `llm_core.transcription.providers`:
+  - `WhisperTranscriber` - wraps `whisper.load_model()`.
+  - `FasterWhisperTranscriber` - wraps `faster_whisper.WhisperModel`;
+    `atranscribe` runs inference in `asyncio.to_thread`.
+  - `OpenAIAPITranscriber` - uses `openai.AsyncOpenAI.audio.transcriptions`.
+
+**Vector store condition filtering** (`llm_core.vectorstores`)
+- Backend-agnostic condition AST (`Condition`, `AndCondition`, `OrCondition`,
+  `NotCondition`, `FieldCondition`).
+- `DeduplicatingMixin` and `EntityStore` updated with condition-based filtering.
+
+**Project metadata**
+- `[project.urls]` in `pyproject.toml` with repository link.
+
+---
+
 ## [0.1.0] - 2026-03-21
 
 Initial release. Extracts and centralises the LLM integration patterns
@@ -99,4 +132,5 @@ Optional extras:
 
 120 tests across all modules; 0 ruff lint errors; 0 pyright type errors.
 
+[0.2.0]: https://github.com/pitrified/llm-core/releases/tag/v0.2.0
 [0.1.0]: https://github.com/pitrified/llm-core/releases/tag/v0.1.0
