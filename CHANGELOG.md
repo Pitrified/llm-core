@@ -7,6 +7,15 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.2.2] - 2026-04-30
+
+### Changed
+
+- Clarified archived agent naming by marking the old `draft-to-plan` agent
+  definition for easier maintenance.
+
+---
+
 ## [0.2.1] - 2026-03-30
 
 ### Changed
