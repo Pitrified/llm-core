@@ -29,4 +29,4 @@ Context: [`00_start.md`](00_start.md).
 - `langchain-core>=1.8`, the one bound raised: it is the version that stops the pydantic V1 warning.
 - `version = "0.3.0"`, lock refreshed, `CHANGELOG.md` entry, `docs/guides/upgrading_0_3.md` in the nav; `mkdocs build --strict` passes.
 - laife relocked on the same stack (still pinned to v0.2.2) with no code change: `make check` and `make headless` pass.
-- Left: the release commit, the local tag, the user's push.
+- Release commit `chore: release v0.3.0` with annotated tag `v0.3.0`, `main` fast-forwarded to it. Left: the user's push of `main` and the tag.

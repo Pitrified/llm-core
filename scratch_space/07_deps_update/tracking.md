@@ -26,3 +26,4 @@ Append-only. Newest at the bottom.
 - 2026-11-13 : split out of `04_gemini_support` phase 3 with the user; decisions in `00_start.md`.
 - 2026-11-13 : phase 1 done: relocked, no code change, tests and ruff pass, pyright errors in the transcription providers 63 to 67, all pre-existing in kind.
 - 2026-11-13 : phase 2 prepared: version 0.3.0, `langchain-core>=1.8`, changelog, dependents guide; laife verified on the same stack. Commit and tag pending.
+- 2026-11-13 : release commit and tag `v0.3.0` made locally, `main` fast-forwarded; push pending, by the user.

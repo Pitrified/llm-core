@@ -1,6 +1,6 @@
 [project]
 name = "llm-core"
-version = "0.2.2"
+version = "0.3.0"
 description = "Reusable LLM tooling library: multi-provider chat/embeddings configs, structured chains, versioned prompts, and vector store abstractions."
 readme = "README.md"
 requires-python = "==3.14.*"
@@ -8,7 +8,7 @@ dependencies = [
     "dotenv>=0.9.9",
     "jinja2>=3.1",
     "langchain>=0.3",
-    "langchain-core>=0.3",
+    "langchain-core>=1.8",
     "loguru>=0.7.3",
     "pydantic>=2.0",
 ]

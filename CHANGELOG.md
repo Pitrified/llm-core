@@ -7,6 +7,21 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.3.0] - 2026-11-13
+
+### Changed
+
+- Dependencies relocked to current versions: langchain-core 1.8, langchain 1.5,
+  langchain-openai 1.7, openai 3, sentence-transformers 6, torch 2.15 (CUDA 13 wheels).
+- `langchain-core` lower bound raised to `>=1.8`: older versions import `pydantic.v1`
+  at import time and warn that it is incompatible with Python 3.14.
+
+### Added
+
+- `docs/guides/upgrading_0_3.md` - how a dependent moves from 0.2.x.
+
+---
+
 ## [0.2.2] - 2026-04-30
 
 ### Changed
