@@ -12,6 +12,8 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - `ChatOpenAIConfig.reasoning_effort`, passed to `ChatOpenAI` when set.
+- `StructuredLLMChain` optional `name` and `on_call`: `on_call(name, model, elapsed_seconds)`
+  runs after each `invoke` or `ainvoke` that returns the output model.
 
 ---
 

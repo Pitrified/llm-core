@@ -181,3 +181,87 @@ class TestInvoke:
         sc._chain = RunnableLambda(lambda _: "not a recipe")  # noqa: SLF001
         with pytest.raises(TypeError, match="Unexpected output type"):
             await sc.ainvoke(RecipeInput(recipe_text="Boil pasta in water"))
+
+
+# -- on_call tests -----------------------------------------------------------
+
+
+class _Calls:
+    """Records the arguments of each on_call."""
+
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, str, float]] = []
+
+    def __call__(self, name: str, model: str, elapsed: float) -> None:
+        self.calls.append((name, model, elapsed))
+
+
+def _timed_chain(calls: _Calls) -> StructuredLLMChain[RecipeInput, RecipeOutput]:
+    return StructuredLLMChain(
+        chat_config=_make_fake_config(),
+        prompt_str=PROMPT,
+        input_model=RecipeInput,
+        output_model=RecipeOutput,
+        name="recipe",
+        on_call=calls,
+    )
+
+
+class TestOnCall:
+    """on_call receives name, model and elapsed seconds of each returned call."""
+
+    def test_invoke_reports(self) -> None:
+        """invoke() calls on_call once with the chain name and model."""
+        calls = _Calls()
+        _timed_chain(calls).invoke(RecipeInput(recipe_text="Boil pasta in water"))
+        assert len(calls.calls) == 1
+        name, model, elapsed = calls.calls[0]
+        assert (name, model) == ("recipe", "fake")
+        assert elapsed >= 0
+
+    @pytest.mark.asyncio
+    async def test_ainvoke_reports(self) -> None:
+        """ainvoke() calls on_call once with the chain name and model."""
+        calls = _Calls()
+        await _timed_chain(calls).ainvoke(
+            RecipeInput(recipe_text="Boil pasta in water")
+        )
+        assert len(calls.calls) == 1
+        name, model, elapsed = calls.calls[0]
+        assert (name, model) == ("recipe", "fake")
+        assert elapsed >= 0
+
+    def test_wrong_output_type_reports_nothing(self) -> None:
+        """A call that raises on the output type does not call on_call."""
+        calls = _Calls()
+        sc = _timed_chain(calls)
+        sc._chain = RunnableLambda(lambda _: "not a recipe")  # noqa: SLF001
+        with pytest.raises(TypeError):
+            sc.invoke(RecipeInput(recipe_text="Boil pasta in water"))
+        assert calls.calls == []
+
+    @pytest.mark.asyncio
+    async def test_failing_call_reports_nothing(self) -> None:
+        """A call whose model raises does not call on_call."""
+        calls = _Calls()
+        sc = _timed_chain(calls)
+
+        def _fail(_: object) -> None:
+            raise RuntimeError
+
+        sc._chain = RunnableLambda(_fail)  # noqa: SLF001
+        with pytest.raises(RuntimeError):
+            await sc.ainvoke(RecipeInput(recipe_text="Boil pasta in water"))
+        assert calls.calls == []
+
+    def test_no_callback(self) -> None:
+        """Without on_call the chain runs as before."""
+        sc = StructuredLLMChain(
+            chat_config=_make_fake_config(),
+            prompt_str=PROMPT,
+            input_model=RecipeInput,
+            output_model=RecipeOutput,
+        )
+        assert sc.on_call is None
+        assert sc.name == ""
+        assert sc.invoke(RecipeInput(recipe_text="x")).name == "Pasta"

@@ -3,7 +3,9 @@
 ``StructuredLLMChain[InputT, OutputT]`` wires a Jinja2 prompt template to a
 chat model and enforces structured Pydantic output. Input field names are
 validated against prompt variables at construction time; the actual chat model
-is created lazily on first ``invoke`` / ``ainvoke``.
+is created lazily on first ``invoke`` / ``ainvoke``. An optional ``on_call``
+callback receives the chain's ``name``, the model name and the elapsed seconds
+of every call that returns, so a caller can time all its LLM calls in one place.
 
 Example:
     ::
@@ -29,8 +31,10 @@ Example:
         result: MyOutput = chain.invoke(MyInput(recipe_text="Boil pasta..."))
 """
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from dataclasses import field
+import time
 from typing import Any
 
 from langchain_core.prompts import ChatPromptTemplate
@@ -56,12 +60,18 @@ class StructuredLLMChain[InputT: BaseModelKwargs, OutputT: BaseModel]:
         prompt_str: Raw Jinja2 template string (system message).
         input_model: Pydantic model whose field names must match prompt variables.
         output_model: Pydantic model enforced via ``with_structured_output``.
+        name: Label passed to ``on_call``; empty by default.
+        on_call: Called as ``on_call(name, model, elapsed_seconds)`` after a
+            call returns the output model. A call that raises, including on a
+            wrong output type, reports nothing.
     """
 
     chat_config: ChatConfig
     prompt_str: str
     input_model: type[InputT]
     output_model: type[OutputT]
+    name: str = ""
+    on_call: Callable[[str, str, float], None] | None = None
     _chain: Any = field(init=False, default=None, repr=False)
 
     def __post_init__(self) -> None:
@@ -102,6 +112,11 @@ class StructuredLLMChain[InputT: BaseModelKwargs, OutputT: BaseModel]:
             self._chain = self._build_chain()
         return self._chain
 
+    def _report(self, started: float) -> None:
+        """Pass the elapsed time since *started* to ``on_call``, if set."""
+        if self.on_call is not None:
+            self.on_call(self.name, self.chat_config.model, time.monotonic() - started)
+
     def invoke(self, chain_input: InputT) -> OutputT:
         """Run the chain synchronously and return the structured output.
 
@@ -115,10 +130,12 @@ class StructuredLLMChain[InputT: BaseModelKwargs, OutputT: BaseModel]:
         Raises:
             TypeError: If the chain returns an unexpected type.
         """
+        started = time.monotonic()
         output = self.chain.invoke(chain_input.to_kw())
         if not isinstance(output, self.output_model):
             msg = f"Unexpected output type: {type(output)}"
             raise TypeError(msg)
+        self._report(started)
         return output  # type: ignore[return-value]
 
     async def ainvoke(self, chain_input: InputT) -> OutputT:
@@ -134,8 +151,10 @@ class StructuredLLMChain[InputT: BaseModelKwargs, OutputT: BaseModel]:
         Raises:
             TypeError: If the chain returns an unexpected type.
         """
+        started = time.monotonic()
         output = await self.chain.ainvoke(chain_input.to_kw())
         if not isinstance(output, self.output_model):
             msg = f"Unexpected output type: {type(output)}"
             raise TypeError(msg)
+        self._report(started)
         return output  # type: ignore[return-value]
