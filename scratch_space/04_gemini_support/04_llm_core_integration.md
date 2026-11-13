@@ -8,7 +8,7 @@ status: planned
 
 Add Gemini as a chat provider in llm-core, mirroring the existing provider pattern exactly.
 Context: [`00_start.md`](00_start.md), depends on [`02_manual_google_setup.md`](02_manual_google_setup.md)
-for a working key and on [`03_deps_update.md`](03_deps_update.md) for a current LangChain (tests that hit the network, if any, follow the repo's existing testing conventions).
+for a working key and on [`07_deps_update`](../07_deps_update/00_start.md) for a current LangChain (tests that hit the network, if any, follow the repo's existing testing conventions).
 
 ## Goals
 

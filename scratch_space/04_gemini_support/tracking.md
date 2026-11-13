@@ -20,7 +20,7 @@ laife as the swappable default. Analysis and decisions in [`00_start.md`](00_sta
 | --- | --------------------- | -------------------------------------------------------- | ------- |
 | 1   | research              | [`01_initial_research.md`](01_initial_research.md)       | done    |
 | 2   | manual google setup   | [`02_manual_google_setup.md`](02_manual_google_setup.md) | planned |
-| 3   | dependency update pass | [`03_deps_update.md`](03_deps_update.md)                | planned |
+| 3   | dependency update pass | [`03_deps_update.md`](03_deps_update.md)                | superseded |
 | 4   | llm-core integration  | [`04_llm_core_integration.md`](04_llm_core_integration.md) | planned |
 | 5   | laife interaction     | [`05_laife_interaction.md`](05_laife_interaction.md)     | draft   |
 | 6   | e2e verification      | [`06_e2e_verification.md`](06_e2e_verification.md)       | draft   |
@@ -41,3 +41,6 @@ Append-only. Newest at the bottom.
   scaffolded tracking.md and sub-plans for phases 2-5.
 - 2026-07-10 : inserted phase 3 (dependency update pass) per user request - uv.lock dated 2026-04-30
   (langchain 1.2.13); renumbered integration/laife/e2e sub-plans to 04/05/06.
+- 2026-11-13 : deferred with the user. The dependency update (phase 3) is split out as
+  [`07_deps_update`](../07_deps_update/00_start.md) and runs now, with release 0.3.0; phase 3 is superseded.
+  When this effort resumes, phase 4 builds on 0.3.0, and phase 5 starts from laife already on 0.3.0.

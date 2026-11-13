@@ -1,5 +1,8 @@
 # feat 04 - gemini support
 
+Deferred 2026-11-13. The dependency update that was phase 3 is its own effort,
+[`07_deps_update`](../07_deps_update/00_start.md), done first; see the tracking log.
+
 Add Google Gemini as a chat provider in llm-core, then wire it into laife as a selectable provider.
 
 Tracked development folder; the index is [`tracking.md`](tracking.md).

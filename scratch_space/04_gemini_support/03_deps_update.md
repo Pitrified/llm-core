@@ -1,8 +1,11 @@
 ---
-status: planned
+status: superseded
 ---
 
 # Phase 3 - dependency update pass
+
+Superseded 2026-11-13: split out as its own effort, [`07_deps_update`](../07_deps_update/00_start.md), run before this one.
+The text below is the plan as it stood.
 
 ## Overview
 
