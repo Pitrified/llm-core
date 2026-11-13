@@ -14,6 +14,9 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `ChatOpenAIConfig.reasoning_effort`, passed to `ChatOpenAI` when set.
 - `StructuredLLMChain` optional `name` and `on_call`: `on_call(name, model, elapsed_seconds)`
   runs after each `invoke` or `ainvoke` that returns the output model.
+- `llm_core.testing.scripted_chat_model`: `ScriptedChatModel` answers `with_structured_output(schema)`
+  from a mapping of output model to callable; `ScriptedChatConfig.build_answers()` is called once
+  per model, so state in the callables is per chain. `UnscriptedSchemaError`, `UnscriptedCallError`.
 
 ---
 
