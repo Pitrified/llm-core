@@ -10,7 +10,11 @@ A reusable LLM tooling library for Python projects.
 - **Embeddings configs** - same provider coverage, same `BaseModelKwargs` pattern.
 - **`StructuredLLMChain[InputT, OutputT]`** - a generic dataclass that wires a Jinja2 prompt
   template to a chat model and enforces structured Pydantic output. Validates prompt variables
-  at construction time. Supports both `invoke` and `ainvoke`.
+  at construction time. Supports both `invoke` and `ainvoke`; an optional `on_call` callback
+  receives the chain's name, the model and the elapsed seconds of each call.
+- **Scripted chat model** - `llm_core.testing.ScriptedChatConfig` answers structured-output calls
+  by output model with no provider, for running an application offline; `FakeChatModelConfig`
+  cycles fixed replies for unit tests.
 - **Versioned Jinja2 prompts** - `PromptLoader` with `version="auto"` picks the highest `vN.jinja`
   file. Prompt files live in the consuming project; the loader is shipped here.
 - **Vector store abstractions** - `VectorStoreConfig` → `ChromaConfig`; `CChroma` with SHA-256
@@ -39,6 +43,7 @@ src/llm_core/
 ├── prompts/       # PromptLoader
 ├── data_models/   # BaseModelKwargs
 ├── metaclasses/   # Singleton
+├── testing/       # FakeChatModel, ScriptedChatModel
 └── params/        # LlmCoreParams, LlmCorePaths, EnvType
 ```
 
