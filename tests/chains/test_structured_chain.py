@@ -1,6 +1,7 @@
 """Tests for StructuredLLMChain."""
 
 from langchain_core.messages import AIMessage
+from langchain_core.runnables import RunnableLambda
 from pydantic import BaseModel
 import pytest
 
@@ -155,3 +156,28 @@ class TestInvoke:
         assert isinstance(result, RecipeOutput)
         assert result.name == "Pasta"
         assert result.ingredients == ["pasta", "water"]
+
+    def test_invoke_raises_on_wrong_output_type(self) -> None:
+        """invoke() raises TypeError when the model returns something else."""
+        sc = StructuredLLMChain(
+            chat_config=_make_fake_config(),
+            prompt_str=PROMPT,
+            input_model=RecipeInput,
+            output_model=RecipeOutput,
+        )
+        sc._chain = RunnableLambda(lambda _: "not a recipe")  # noqa: SLF001
+        with pytest.raises(TypeError, match="Unexpected output type"):
+            sc.invoke(RecipeInput(recipe_text="Boil pasta in water"))
+
+    @pytest.mark.asyncio
+    async def test_ainvoke_raises_on_wrong_output_type(self) -> None:
+        """ainvoke() raises TypeError when the model returns something else."""
+        sc = StructuredLLMChain(
+            chat_config=_make_fake_config(),
+            prompt_str=PROMPT,
+            input_model=RecipeInput,
+            output_model=RecipeOutput,
+        )
+        sc._chain = RunnableLambda(lambda _: "not a recipe")  # noqa: SLF001
+        with pytest.raises(TypeError, match="Unexpected output type"):
+            await sc.ainvoke(RecipeInput(recipe_text="Boil pasta in water"))
