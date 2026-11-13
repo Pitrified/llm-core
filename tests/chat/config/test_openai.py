@@ -38,3 +38,17 @@ def test_api_key_excluded_when_none() -> None:
     cfg = ChatOpenAIConfig(api_key=None)
     kw = cfg.to_kw(exclude_none=True)
     assert "api_key" not in kw
+
+
+def test_reasoning_effort_excluded_when_none() -> None:
+    """None reasoning_effort is left out of to_kw(exclude_none=True)."""
+    cfg = ChatOpenAIConfig()
+    kw = cfg.to_kw(exclude_none=True)
+    assert "reasoning_effort" not in kw
+
+
+def test_reasoning_effort_reaches_model() -> None:
+    """reasoning_effort is passed to the built ChatOpenAI."""
+    cfg = ChatOpenAIConfig(api_key=SecretStr("sk-test"), reasoning_effort="none")
+    model = cfg.create_chat_model()
+    assert getattr(model, "reasoning_effort", None) == "none"

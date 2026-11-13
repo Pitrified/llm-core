@@ -7,6 +7,14 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- `ChatOpenAIConfig.reasoning_effort`, passed to `ChatOpenAI` when set.
+
+---
+
 ## [0.3.1] - 2026-11-13
 
 ### Added

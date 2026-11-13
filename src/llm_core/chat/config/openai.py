@@ -14,6 +14,9 @@ class ChatOpenAIConfig(ChatConfig):
         model: Model name to use. Defaults to "gpt-4o-mini".
         model_provider: Provider name for init_chat_model. Always "openai".
         api_key: OpenAI API key. Reads OPENAI_API_KEY env var by default.
+        reasoning_effort: Reasoning effort for reasoning models, such as
+            "none" or "low"; left out of the request when None. langchain-openai
+            drops a non-default temperature on gpt-5 models unless this is "none".
     """
 
     model: str = "gpt-4o-mini"
@@ -21,3 +24,4 @@ class ChatOpenAIConfig(ChatConfig):
     api_key: SecretStr | None = Field(
         default_factory=secret_from_env("OPENAI_API_KEY", default=None)
     )
+    reasoning_effort: str | None = None
